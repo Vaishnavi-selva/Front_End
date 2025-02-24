@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Resume Builder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+        }
+        h1 {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            border-radius: 5px;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .resume {
+            display: none;
+            margin: 0 auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 900px;
+            background: #fff;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            text-align: left;
+            border-radius: 5px;
+            position: relative;
+        }
+        .resume h2 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid #007bff;
+            object-fit: cover;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .resume h3 {
+            color: #007bff;
+            margin-top: 15px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .resume p, .resume ul {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .resume ul {
+            padding-left: 20px;
+        }
+        .resume a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Smart Resume Builder</h1>
+
+<div class="container">
+    <h2>Enter Your Details</h2>
+
+    <label for="name">Full Name</label>
+    <input type="text" id="name" placeholder="Your Name">
+
+    <label for="email">Email</label>
+    <input type="text" id="email" placeholder="Your Email">
+
+    <label for="phone">Phone</label>
+    <input type="text" id="phone" placeholder="Your Phone">
+
+    <label for="city">City</label>
+    <input type="text" id="city" placeholder="City">
+
+    <h3>Education</h3>
+    <label for="school">School</label>
+    <input type="text" id="school" placeholder="School Name">
+    <label for="college">College</label>
+    <input type="text" id="college" placeholder="College Name">
+
+    <h3>Profile Links</h3>
+    <label for="github">GitHub</label>
+    <input type="url" id="github" placeholder="GitHub Profile Link">
+    <label for="linkedin">LinkedIn</label>
+    <input type="url" id="linkedin" placeholder="LinkedIn Profile Link">
+
+    <h3>Projects</h3>
+    <textarea id="projects" placeholder="Enter your projects (comma-separated)"></textarea>
+
+    <h3>Skills</h3>
+
+<label for="hardskills">Hard Skills</label>
+<textarea id="hardskills" placeholder="e.g., Python, Java, SQL, Machine Learning"></textarea>
+
+<label for="softskills">Soft Skills</label>
+<textarea id="softskills" placeholder="e.g., Communication, Leadership, Problem-Solving"></textarea>
+
+    <h3>Experience</h3>
+    <div id="experienceContainer">
+        <input type="text" class="experience" placeholder="Enter Work Experience">
+    </div>
+    <button onclick="addExperience()">Add More Experience</button>
+
+    <h3>Upload Profile Picture</h3>
+    <input type="file" id="profilePic" accept="image/*" onchange="previewImage()">
+
+    <button onclick="generateResume()">Generate Resume</button>
+</div>
+
+<div class="resume" id="resume">
+    <img id="rProfilePic" class="profile-pic" src="https://via.placeholder.com/120" alt="Profile Picture">
+    
+    <h2 id="rName"></h2>
+    <p><strong>Email:</strong> <span id="rEmail"></span></p>
+    <p><strong>Phone:</strong> <span id="rPhone"></span></p>
+    <p><strong>City:</strong> <span id="rCity"></span></p>
+
+    <h3>Education</h3>
+    <p><strong>School:</strong> <span id="rSchool"></span></p>
+    <p><strong>College:</strong> <span id="rCollege"></span></p>
+
+    <h3>Profile Links</h3>
+    <p><strong>GitHub:</strong> <a id="rGitHub" href="#" target="_blank"></a></p>
+    <p><strong>LinkedIn:</strong> <a id="rLinkedIn" href="#" target="_blank"></a></p>
+
+    <h3>Projects</h3>
+    <ul id="rProjects"></ul>
+    <h3>Hard Skills</h3>
+    <ul id="rHardSkills"></ul>
+    
+    <h3>Soft Skills</h3>
+    <ul id="rSoftSkills"></ul>
+    
+    <h3>Experience</h3>
+    <ul id="rExperience"></ul>
+
+    <button onclick="downloadResume()">Download Resume</button>
+</div>
+
+<script>
+    function generateResume() {
+    document.getElementById("resume").style.display = "block";
+
+    document.getElementById("rName").innerText = document.getElementById("name").value;
+    document.getElementById("rEmail").innerText = document.getElementById("email").value;
+    document.getElementById("rPhone").innerText = document.getElementById("phone").value;
+    document.getElementById("rSchool").innerText = document.getElementById("school").value;
+    document.getElementById("rCollege").innerText = document.getElementById("college").value;
+    document.getElementById("rCity").innerText = document.getElementById("city").value;
+    document.getElementById("rGitHub").innerText = document.getElementById("github").value;
+    document.getElementById("rLinkedIn").innerText = document.getElementById("linkedin").value;
+    
+
+    document.getElementById("rGitHub").href = document.getElementById("github").value;
+    document.getElementById("rLinkedIn").href = document.getElementById("linkedin").value;
+
+    document.getElementById("rProjects").innerHTML = document.getElementById("projects").value.split(",").map(p => `<li>${p.trim()}</li>`).join("");
+
+    document.getElementById("rHardSkills").innerHTML = document.getElementById("hardskills").value.split(",").map(s => `<li>${s.trim()}</li>`).join("");
+    document.getElementById("rSoftSkills").innerHTML = document.getElementById("softskills").value.split(",").map(s => `<li>${s.trim()}</li>`).join("");
+
+    document.getElementById("rExperience").innerHTML = Array.from(document.querySelectorAll(".experience")).map(exp => `<li>${exp.value}</li>`).join("");
+}
+
+
+    function addExperience() {
+        let newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.className = "experience";
+        newInput.placeholder = "Enter Work Experience";
+        document.getElementById("experienceContainer").appendChild(newInput);
+    }
+
+    function previewImage() {
+        let file = document.getElementById("profilePic").files[0];
+        let reader = new FileReader();
+        reader.onloadend = () => document.getElementById("rProfilePic").src = reader.result;
+        if (file) reader.readAsDataURL(file);
+    }
+
+    function downloadResume() {
+    
+        let downloadBtn = document.querySelector("#resume button"); 
+    downloadBtn.style.display = "none"; 
+    html2pdf().from(document.getElementById("resume")).save().then(() => {
+        downloadBtn.style.display = "block"; 
+    });
+    downloadBtn = document.querySelector("#resume button"); // Select the download button
+    downloadBtn.style.display = "none"; // Hide the button
+
+    let element = document.getElementById("resume");
+    let opt = {
+        margin: [5, 5, 5, 5], // Reduce margins (top, left, bottom, right)
+        filename: 'resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().from(element).set(opt).save().then(() => {
+        downloadBtn.style.display = "block"; // Restore the button after download
+    });
+    }
+    
+
+</script>
+
+</body>
+</html>
